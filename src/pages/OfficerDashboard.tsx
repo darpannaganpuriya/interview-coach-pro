@@ -15,7 +15,7 @@ const activeJDs = [
 
 const OfficerDashboard = () => {
   const { toast } = useToast();
-  const { shortlist, generate, isGenerating } = useShortlist();
+  const { candidates: shortlist, generate, isLoading: isGenerating } = useShortlist();
   const [activeJdId, setActiveJdId] = useState<string | null>(null);
 
   const handleGenerate = async (jdId: string, company: string) => {

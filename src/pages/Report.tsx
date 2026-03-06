@@ -35,7 +35,7 @@ const Report = () => {
   const sessionId = searchParams.get("session") || "default";
   const [expandedQ, setExpandedQ] = useState<number | null>(0);
 
-  const { analysis, analyze, isAnalyzing, error } = useTranscriptAnalysis();
+  const { analysis, analyze, isLoading: isAnalyzing, error } = useTranscriptAnalysis();
 
   // Auto-trigger analysis on mount
   useEffect(() => {
