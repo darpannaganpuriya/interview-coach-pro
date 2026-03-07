@@ -14,7 +14,169 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      interview_sessions: {
+        Row: {
+          company: string
+          created_at: string
+          current_question_index: number | null
+          duration_seconds: number | null
+          id: string
+          resume_id: string | null
+          role: string
+          status: string
+          total_questions: number | null
+          transcript: Json | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          company: string
+          created_at?: string
+          current_question_index?: number | null
+          duration_seconds?: number | null
+          id?: string
+          resume_id?: string | null
+          role: string
+          status?: string
+          total_questions?: number | null
+          transcript?: Json | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          company?: string
+          created_at?: string
+          current_question_index?: number | null
+          duration_seconds?: number | null
+          id?: string
+          resume_id?: string | null
+          role?: string
+          status?: string
+          total_questions?: number | null
+          transcript?: Json | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "interview_sessions_resume_id_fkey"
+            columns: ["resume_id"]
+            isOneToOne: false
+            referencedRelation: "resumes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+          role: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          role?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          role?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      reports: {
+        Row: {
+          categories: Json | null
+          created_at: string
+          id: string
+          improvements: Json | null
+          overall_score: number | null
+          question_breakdown: Json | null
+          session_id: string
+          strengths: Json | null
+          summary: string | null
+          user_id: string
+        }
+        Insert: {
+          categories?: Json | null
+          created_at?: string
+          id?: string
+          improvements?: Json | null
+          overall_score?: number | null
+          question_breakdown?: Json | null
+          session_id: string
+          strengths?: Json | null
+          summary?: string | null
+          user_id: string
+        }
+        Update: {
+          categories?: Json | null
+          created_at?: string
+          id?: string
+          improvements?: Json | null
+          overall_score?: number | null
+          question_breakdown?: Json | null
+          session_id?: string
+          strengths?: Json | null
+          summary?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reports_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "interview_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      resumes: {
+        Row: {
+          analysis: Json | null
+          created_at: string
+          file_name: string
+          file_url: string
+          id: string
+          jd_matches: Json | null
+          user_id: string
+        }
+        Insert: {
+          analysis?: Json | null
+          created_at?: string
+          file_name: string
+          file_url: string
+          id?: string
+          jd_matches?: Json | null
+          user_id: string
+        }
+        Update: {
+          analysis?: Json | null
+          created_at?: string
+          file_name?: string
+          file_url?: string
+          id?: string
+          jd_matches?: Json | null
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
