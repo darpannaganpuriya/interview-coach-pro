@@ -1,15 +1,50 @@
 import Navbar from "@/components/layout/Navbar";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Download, ChevronDown, ChevronUp, Loader2 } from "lucide-react";
-import { useState, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
-import { useTranscriptAnalysis } from "@/hooks/useTranscriptAnalysis";
+import { Download, ChevronDown, ChevronUp } from "lucide-react";
+import { useState } from "react";
 import {
   RadialBarChart, RadialBar, ResponsiveContainer,
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
   RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar,
 } from "recharts";
+
+const overallScore = 82;
+
+const scoreRings = [
+  { name: "Technical", score: 85, fill: "hsl(190, 95%, 50%)" },
+  { name: "Communication", score: 78, fill: "hsl(260, 70%, 60%)" },
+  { name: "Body Language", score: 88, fill: "hsl(160, 70%, 45%)" },
+];
+
+const topicScores = [
+  { topic: "React.js", score: 90 },
+  { topic: "System Design", score: 75 },
+  { topic: "DSA", score: 82 },
+  { topic: "APIs", score: 88 },
+  { topic: "Databases", score: 70 },
+];
+
+const radarData = [
+  { subject: "Clarity", A: 85 },
+  { subject: "Depth", A: 78 },
+  { subject: "Confidence", A: 82 },
+  { subject: "Pace", A: 75 },
+  { subject: "Structure", A: 90 },
+  { subject: "Examples", A: 88 },
+];
+
+const qaTranscript = [
+  { q: "Tell me about yourself.", a: "I'm a final year CSE student passionate about full-stack development...", score: "Good" },
+  { q: "Explain the architecture of your collaboration tool.", a: "I used WebSockets with CRDT-based conflict resolution, a Node.js backend with Redis pub/sub...", score: "Excellent" },
+  { q: "How would you design a URL shortener?", a: "I'd use a hashing approach with base62 encoding, a relational DB for storage, and Redis for caching...", score: "Good" },
+];
+
+const tips = [
+  "Practice system design questions — your depth was strong but needed more mention of trade-offs.",
+  "Reduce filler words ('um', 'like') — detected 7 times in 22 minutes.",
+  "When discussing projects, always mention the scale and impact metrics.",
+];
 
 const ScoreRing = ({ score, label, color }: { score: number; label: string; color: string }) => {
   const data = [{ name: label, value: score, fill: color }];
@@ -31,73 +66,10 @@ const ScoreRing = ({ score, label, color }: { score: number; label: string; colo
 };
 
 const Report = () => {
-  const [searchParams] = useSearchParams();
-  const sessionId = searchParams.get("session") || "default";
   const [expandedQ, setExpandedQ] = useState<number | null>(0);
 
-  const { analysis, analyze, isLoading: isAnalyzing, error } = useTranscriptAnalysis();
-
-  // Auto-trigger analysis on mount
-  useEffect(() => {
-    analyze(sessionId);
-  }, [sessionId]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const handleDownloadPDF = () => {
-    // TODO: Call backend PDF generation endpoint
-    // For now, use browser print
-    window.print();
-  };
-
-  if (isAnalyzing || !analysis) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Navbar />
-        <div className="pt-20 flex items-center justify-center min-h-[60vh]">
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center">
-            <Loader2 className="w-12 h-12 text-primary mx-auto mb-4 animate-spin" />
-            <h2 className="font-display text-xl font-bold text-foreground mb-2">Analyzing your interview...</h2>
-            <p className="text-muted-foreground text-sm">Our AI agent is evaluating your performance</p>
-          </motion.div>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Navbar />
-        <div className="pt-20 flex items-center justify-center min-h-[60vh]">
-          <div className="text-center">
-            <p className="text-destructive mb-2">Failed to load report</p>
-            <Button variant="hero" onClick={() => analyze(sessionId)}>Retry</Button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  const scoreRings = [
-    { name: "Technical", score: analysis.categories.technicalAccuracy, fill: "hsl(190, 95%, 50%)" },
-    { name: "Communication", score: analysis.categories.communication, fill: "hsl(260, 70%, 60%)" },
-    { name: "Confidence", score: analysis.categories.confidence, fill: "hsl(160, 70%, 45%)" },
-  ];
-
-  const radarData = [
-    { subject: "Technical", A: analysis.categories.technicalAccuracy },
-    { subject: "Communication", A: analysis.categories.communication },
-    { subject: "Problem Solving", A: analysis.categories.problemSolving },
-    { subject: "Confidence", A: analysis.categories.confidence },
-    { subject: "Body Language", A: analysis.categories.bodyLanguage },
-  ];
-
-  const topicScores = analysis.questionBreakdown.map((q, i) => ({
-    topic: `Q${i + 1}`,
-    score: q.score,
-  }));
-
   return (
-    <div className="min-h-screen bg-background print:bg-white">
+    <div className="min-h-screen bg-background">
       <Navbar />
       <div className="pt-20 pb-12">
         <div className="container mx-auto px-4 max-w-5xl">
@@ -105,9 +77,9 @@ const Report = () => {
             <div className="flex items-center justify-between mb-2">
               <div>
                 <h1 className="font-display text-3xl font-bold text-foreground">Interview Report</h1>
-                <p className="text-muted-foreground">Session: {sessionId}</p>
+                <p className="text-muted-foreground">Google — SDE Intern • Feb 28, 2026 • 22 minutes</p>
               </div>
-              <Button variant="hero-outline" size="sm" onClick={handleDownloadPDF}>
+              <Button variant="hero-outline" size="sm">
                 <Download className="w-4 h-4 mr-1" /> Export PDF
               </Button>
             </div>
@@ -119,7 +91,7 @@ const Report = () => {
             animate={{ opacity: 1, scale: 1 }}
             className="p-8 rounded-xl bg-card border border-border mb-8 text-center"
           >
-            <div className="font-display text-6xl font-bold text-gradient mb-2">{analysis.overallScore}%</div>
+            <div className="font-display text-6xl font-bold text-gradient mb-2">{overallScore}%</div>
             <p className="text-muted-foreground">Overall Interview Score</p>
           </motion.div>
 
@@ -146,7 +118,7 @@ const Report = () => {
               transition={{ delay: 0.4 }}
               className="p-6 rounded-xl bg-card border border-border"
             >
-              <h3 className="font-display font-semibold mb-4 text-foreground">Question Scores</h3>
+              <h3 className="font-display font-semibold mb-4 text-foreground">Topic Breakdown</h3>
               <ResponsiveContainer width="100%" height={220}>
                 <BarChart data={topicScores}>
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(222, 30%, 18%)" />
@@ -164,7 +136,7 @@ const Report = () => {
               transition={{ delay: 0.5 }}
               className="p-6 rounded-xl bg-card border border-border"
             >
-              <h3 className="font-display font-semibold mb-4 text-foreground">Skills Radar</h3>
+              <h3 className="font-display font-semibold mb-4 text-foreground">Communication Radar</h3>
               <ResponsiveContainer width="100%" height={220}>
                 <RadarChart data={radarData}>
                   <PolarGrid stroke="hsl(222, 30%, 18%)" />
@@ -176,65 +148,55 @@ const Report = () => {
             </motion.div>
           </div>
 
-          {/* Strengths & Improvements */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }} className="p-6 rounded-xl bg-card border border-border">
-              <h3 className="font-display font-semibold mb-3 text-success">✅ Strengths</h3>
-              <ul className="space-y-2">
-                {analysis.strengths.map((s, i) => (
-                  <li key={i} className="text-sm text-foreground flex gap-2">
-                    <span className="text-success">•</span> {s}
-                  </li>
-                ))}
-              </ul>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.65 }} className="p-6 rounded-xl bg-card border border-border">
-              <h3 className="font-display font-semibold mb-3 text-warning">💡 Areas to Improve</h3>
-              <ul className="space-y-2">
-                {analysis.improvements.map((s, i) => (
-                  <li key={i} className="text-sm text-foreground flex gap-2">
-                    <span className="text-warning">•</span> {s}
-                  </li>
-                ))}
-              </ul>
-            </motion.div>
-          </div>
-
-          {/* AI Summary */}
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 }} className="p-6 rounded-xl bg-card border border-border mb-8">
-            <h3 className="font-display font-semibold mb-3 text-foreground">AI Summary</h3>
-            <p className="text-sm text-muted-foreground leading-relaxed">{analysis.summary}</p>
+          {/* Improvement Tips */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6 }}
+            className="p-6 rounded-xl bg-card border border-border mb-8"
+          >
+            <h3 className="font-display font-semibold mb-4 text-foreground">Improvement Tips</h3>
+            <div className="space-y-3">
+              {tips.map((tip, i) => (
+                <div key={i} className="flex items-start gap-3 p-3 rounded-lg bg-primary/5 border border-primary/10">
+                  <span className="text-primary font-bold">{i + 1}.</span>
+                  <p className="text-sm text-foreground">{tip}</p>
+                </div>
+              ))}
+            </div>
           </motion.div>
 
-          {/* Q&A Breakdown */}
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.75 }} className="p-6 rounded-xl bg-card border border-border">
-            <h3 className="font-display font-semibold mb-4 text-foreground">Q&A Breakdown</h3>
+          {/* Q&A Transcript */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.7 }}
+            className="p-6 rounded-xl bg-card border border-border"
+          >
+            <h3 className="font-display font-semibold mb-4 text-foreground">Q&A Transcript</h3>
             <div className="space-y-3">
-              {analysis.questionBreakdown.map((item, i) => (
+              {qaTranscript.map((item, i) => (
                 <div key={i} className="rounded-lg border border-border overflow-hidden">
                   <button
                     onClick={() => setExpandedQ(expandedQ === i ? null : i)}
                     className="w-full flex items-center justify-between p-4 text-left hover:bg-secondary/50 transition-colors"
                   >
-                    <div className="flex items-center gap-3 flex-1 mr-4">
+                    <div className="flex items-center gap-3">
                       <span className="text-xs font-medium text-muted-foreground">Q{i + 1}</span>
-                      <span className="text-sm text-foreground truncate">{item.question}</span>
+                      <span className="text-sm text-foreground">{item.q}</span>
                     </div>
-                    <div className="flex items-center gap-2 shrink-0">
-                      <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${
-                        item.score >= 85 ? "bg-success/10 text-success" :
-                        item.score >= 70 ? "bg-primary/10 text-primary" :
-                        "bg-warning/10 text-warning"
+                    <div className="flex items-center gap-2">
+                      <span className={`text-xs px-2 py-0.5 rounded-full ${
+                        item.score === "Excellent" ? "bg-success/10 text-success" : "bg-primary/10 text-primary"
                       }`}>
-                        {item.score}%
+                        {item.score}
                       </span>
                       {expandedQ === i ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
                     </div>
                   </button>
                   {expandedQ === i && (
-                    <div className="px-4 pb-4 border-t border-border pt-3 space-y-2">
-                      <p className="text-sm text-foreground"><strong>Your answer:</strong> {item.answer}</p>
-                      <p className="text-sm text-muted-foreground"><strong>Feedback:</strong> {item.feedback}</p>
+                    <div className="px-4 pb-4 border-t border-border pt-3">
+                      <p className="text-sm text-muted-foreground">{item.a}</p>
                     </div>
                   )}
                 </div>

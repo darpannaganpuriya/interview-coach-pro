@@ -1,34 +1,20 @@
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Brain, Menu, X, LogOut } from "lucide-react";
+import { Brain, Menu, X } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useAuth } from "@/contexts/AuthContext";
+
+const navLinks = [
+  { label: "Features", href: "/#features" },
+  { label: "Student Dashboard", href: "/dashboard" },
+  { label: "Interview Room", href: "/interview" },
+  { label: "Report", href: "/report" },
+  { label: "Officer Panel", href: "/officer" },
+];
 
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
-  const navigate = useNavigate();
-  const { isAuthenticated, user, logout } = useAuth();
-
-  const navLinks = isAuthenticated
-    ? user?.role === "officer"
-      ? [
-          { label: "Officer Panel", href: "/officer" },
-        ]
-      : [
-          { label: "Dashboard", href: "/dashboard" },
-          { label: "Interview Room", href: "/interview" },
-          { label: "Report", href: "/report" },
-        ]
-    : [
-        { label: "Features", href: "/#features" },
-      ];
-
-  const handleLogout = () => {
-    logout();
-    navigate("/");
-  };
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 glass">
@@ -57,19 +43,8 @@ const Navbar = () => {
         </div>
 
         <div className="hidden md:flex items-center gap-2">
-          {isAuthenticated ? (
-            <>
-              <span className="text-sm text-muted-foreground">{user?.name}</span>
-              <Button variant="ghost" size="sm" onClick={handleLogout}>
-                <LogOut className="w-4 h-4 mr-1" /> Logout
-              </Button>
-            </>
-          ) : (
-            <>
-              <Button variant="ghost" size="sm" onClick={() => navigate("/login")}>Sign In</Button>
-              <Button variant="hero" size="sm" onClick={() => navigate("/signup")}>Get Started</Button>
-            </>
-          )}
+          <Button variant="ghost" size="sm">Sign In</Button>
+          <Button variant="hero" size="sm">Get Started</Button>
         </div>
 
         <button className="md:hidden text-foreground" onClick={() => setMobileOpen(!mobileOpen)}>
@@ -97,16 +72,8 @@ const Navbar = () => {
                 </Link>
               ))}
               <div className="flex gap-2 pt-2 border-t border-border">
-                {isAuthenticated ? (
-                  <Button variant="ghost" size="sm" className="flex-1" onClick={handleLogout}>
-                    <LogOut className="w-4 h-4 mr-1" /> Logout
-                  </Button>
-                ) : (
-                  <>
-                    <Button variant="ghost" size="sm" className="flex-1" onClick={() => { navigate("/login"); setMobileOpen(false); }}>Sign In</Button>
-                    <Button variant="hero" size="sm" className="flex-1" onClick={() => { navigate("/signup"); setMobileOpen(false); }}>Get Started</Button>
-                  </>
-                )}
+                <Button variant="ghost" size="sm" className="flex-1">Sign In</Button>
+                <Button variant="hero" size="sm" className="flex-1">Get Started</Button>
               </div>
             </div>
           </motion.div>
